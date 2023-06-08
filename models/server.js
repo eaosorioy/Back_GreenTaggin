@@ -4,6 +4,7 @@ import express from "express";
 
 //Routes
 import userRoutes from "../routes/user.js";
+import { dbConnection } from "../database/config.js";
 
 class Server {
 
@@ -14,11 +15,18 @@ class Server {
         //Paths routes
         this.userPath = '/api/user';
 
+        //Connect DB
+        this.connectDB();
+
         //Middlewares (Funciones adicionales del servidor)
         this.middlewares();
 
         //Routes
         this.routes();
+    }
+
+    async connectDB() {
+        await dbConnection();
     }
 
     middlewares() {

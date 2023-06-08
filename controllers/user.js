@@ -1,52 +1,99 @@
 import { response, request } from 'express';
+import bcryptjs from 'bcryptjs';
 
-const getUsers = (req = request, res = response) => {
+import User from '../models/user.js';
 
-    // Query params (Vienen como parametros en la ruta que son opcionales por lo que no hay que definirlos en los routes del get en este caso)
-    const query = req.query;
+const getUsers = async (req = request, res = response) => {
+
+    const { limit = 5, page = 0 } = req.query;
+    const query = { status: true };
+
+    /*
+    //-----------------------------------------DOCUMENTACIÓN-----------------------------------------//
+        const users = await User.find(query) //status para traer los usuarios activos
+            .skip(Number(page)) // Desde que registro quiero mostrar
+            .limit(Number(limit)); // Limite de datos de la consulta
+
+        const total = await User.countDocuments(); //Total de usuarios
+
+        // NOTA: este Promiseall() reemplaza lo comentado arriba
+                - Tener en cuenta: El await para que espere la respuesta de todas las promesas
+                - Tener en cuenta: Que es porque ambas promesas no dependen de la otra
+                - Tener en cuenta: Que reduce tiempos de respuesta
+                - Tener en cuenta: Me permite enviar un array con todas las promesas que se estan ejecutando, en este caso los awaits anteriores
+    //-----------------------------------------DOCUMENTACIÓN-----------------------------------------//
+    */
+    const [total, users] = await Promise.all([// Se desestructura para poder segmentar las respuestas
+        User.countDocuments(query),
+        User.find(query)
+            .skip(Number(page))
+            .limit(Number(limit))
+    ]);
 
     res.json({
-        query,
-        message: 'GET API - Controlador'
+        total,
+        users
     });
 }
 
-const postUsers = (req, res = response) => {
-    const {name, age} = req.body;
-    res.json({
-        age,
-        name,
-        message: 'POST API - Controlador'
-    });
+const postUser = async (req, res = response) => {
+
+    const { name, email, password, rol } = req.body;
+    const user = new User({ name, email, password, rol });
+
+    //Encriptar contraseña (Hash)
+    const salt = bcryptjs.genSaltSync(10); //Numero de vueltas de encriptado
+    user.password = bcryptjs.hashSync(password, salt); //Encriptación de una sola via
+
+    //Guardar en DB
+    await user.save();
+
+    //Respuesta al cliente
+    res.json(user);
 }
 
-const putUsers = (req, res = response) => {
+const putUser = async (req, res = response) => {
 
     // Parametro de segmento (Se envia por la ruta y se debe especificar en la ruta put en este caso de los routes (/:id))
-    const {id} = req.params;
+    const { id } = req.params;
+    // Discriminamos del body algunos parametros que no necesito
+    const { _id, password, google, ...user } = req.body;
 
-    res.json({
-        id,
-        message: 'PUT API - Controlador'
-    });
+    //TODO Validar contra DB
+    if (password) {
+        //Encriptar contraseña (Hash)
+        const salt = bcryptjs.genSaltSync(10); //Numero de vueltas de encriptado
+        user.password = bcryptjs.hashSync(password, salt); //Encriptación de una sola via
+    }
+
+    const userDB = await User.findByIdAndUpdate(id, user);
+
+    res.json(userDB);
 }
 
-const patchUsers = (req, res = response) => {
+const patchUser = (req, res = response) => {
     res.json({
         message: 'PATCH API - Controlador'
     });
 }
 
-const deleteUsers = (req, res = response) => {
-    res.json({
-        message: 'DELETE API - Controlador'
-    });
+const deleteUser = async (req, res = response) => {
+    
+    const { id } = req.params;
+
+    //Borrado fisicamente
+    // const user = await User.findByIdAndDelete(id);
+
+    //Borrado lógico
+    const user = await User.findByIdAndUpdate(id, {status: false});
+
+    res.json(user);
 }
 
 export {
     getUsers,
-    putUsers,
-    postUsers,
-    patchUsers,
-    deleteUsers,
+    putUser,
+    postUser,
+    patchUser,
+    deleteUser,
 }
