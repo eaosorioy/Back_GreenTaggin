@@ -35,8 +35,8 @@ const UserSchema = Schema({
 
 // Aca puedo incluso sobreescribir metodos propios del modelo, como finOne y demas...
 UserSchema.methods.toJSON = function() {
-    const {__v, password, ...user} = this.toObject(); // toOBJECT() me genera uns instancia pero con el contexto de la funcion toJSON, es decir me deja trabajar con sus valores respectivos (name, email, rol, etc...)
-    
+    const {__v, password, _id, ...user} = this.toObject(); // toOBJECT() me genera uns instancia pero con el contexto de la funcion toJSON, es decir me deja trabajar con sus valores respectivos (name, email, rol, etc...)
+    user.uid = _id;
     return user; // Estoy diciendo que cuando retorne la respuesta de algun metodo excluya __v y password
 }
 

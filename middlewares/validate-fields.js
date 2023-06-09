@@ -6,7 +6,7 @@ const validateFields = (req, res, next)=> {
     if(!errors.isEmpty()){
         return res.status(400).json(errors);
     }
-
+    
     // Deja pasar en caso tal de no existir errores en las validaciones
     next();
 }

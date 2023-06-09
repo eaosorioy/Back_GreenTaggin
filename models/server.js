@@ -3,7 +3,9 @@ import cors from "cors"; // Me permiten especificar quienes pueden hacer petiico
 import express from "express";
 
 //Routes
+import authRoutes from "../routes/auth.js";
 import userRoutes from "../routes/user.js";
+
 import { dbConnection } from "../database/config.js";
 
 class Server {
@@ -14,6 +16,7 @@ class Server {
 
         //Paths routes
         this.userPath = '/api/user';
+        this.authPath = '/api/auth';
 
         //Connect DB
         this.connectDB();
@@ -36,6 +39,7 @@ class Server {
     }
 
     routes() {
+        this.app.use(this.authPath, authRoutes);
         this.app.use(this.userPath, userRoutes);
     }
 
