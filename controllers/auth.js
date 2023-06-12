@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
 import { response } from "express";
 import User from '../models/user.js';
@@ -49,6 +50,48 @@ const login = async (req, res = response) => {
 
 }
 
+const validToken = async (req, res = response) => {
+
+    const token = req.headers.authorization.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({
+            message: 'No hay token en la peticion'
+        })
+    }
+
+    try {
+        //Verificamos el token
+        const {uid} = jwt.verify(token, process.env.SECRETORPUBLICKEY);
+
+        //Leer el usuario que corresponde al uid
+        const user = await User.findById(uid);
+
+        //validar si el usuario sigue activo
+        if (!user) {
+            return res.status(401).json({
+                message: 'Token no válido - no existe usuario'
+            })
+        }
+
+        if (!user.status) {
+            return res.status(401).json({
+                message: 'Token no válido - usuario inactivo'
+            })
+        }
+
+        return res.status(200).json({ message: 'Token válido', user, token });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({
+            message: 'Token no válido'
+        })
+    }
+
+}
+
 export {
-    login
+    login,
+    validToken
 }

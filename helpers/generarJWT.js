@@ -14,7 +14,7 @@ const generarJWT = (uid = '') => {
 
         //Firma del token
         jwt.sign(payload, process.env.SECRETORPUBLICKEY, {
-            expiresIn: '4h' //Expiración del token
+            expiresIn: '8h' //Expiración del token
         }, (err, token) => {
             if (err) {
                 console.log(err)
