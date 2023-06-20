@@ -159,8 +159,6 @@ const uploadFiles = (req, res = response) => {
     return;
   }
 
-  sampleFile = req.files.file;
-
   const { file } = req.files;
 
     let jsonData = [];
@@ -203,8 +201,6 @@ const uploadKeywords = (req, res = response) => {
     res.status(400).send('No hay archivos para subir');
     return;
   }
-
-  sampleFile = req.files.file;
 
   const { file } = req.files;
 
