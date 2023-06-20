@@ -1,10 +1,12 @@
 
 import cors from "cors"; // Me permiten especificar quienes pueden hacer petiicones al API
 import express from "express";
+import fileUpload from "express-fileupload";
 
 //Routes
 import authRoutes from "../routes/auth.js";
 import userRoutes from "../routes/user.js";
+import uploadRoutes from "../routes/uploads.js";
 
 import { dbConnection } from "../database/config.js";
 
@@ -17,6 +19,7 @@ class Server {
         //Paths routes
         this.userPath = '/api/user';
         this.authPath = '/api/auth';
+        this.uploadsPath = '/api/uploads';
 
         //Connect DB
         this.connectDB();
@@ -36,11 +39,18 @@ class Server {
         this.app.use(cors()); // CORS
         this.app.use(express.json()); //Lectura y parseo del body (formato json)
         this.app.use(express.static('public'));// Directorio publico
+
+        /* file upload */
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
     }
 
     routes() {
         this.app.use(this.authPath, authRoutes);
         this.app.use(this.userPath, userRoutes);
+        this.app.use(this.uploadsPath, uploadRoutes);
     }
 
     listen() {
