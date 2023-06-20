@@ -154,9 +154,6 @@ const insertKeywords = async (array) => {
 
 const uploadFiles = (req, res = response) => {
 
-  let sampleFile;
-  let uploadPath;
-
   if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
     res.status(400).send('No hay archivos para subir');
     return;
@@ -166,17 +163,9 @@ const uploadFiles = (req, res = response) => {
 
   const { file } = req.files;
 
-  uploadPath = path.join(__dirname, '../uploads/', sampleFile.name);
-
-  file.mv(uploadPath, (err) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ err });
-    }
-
     let jsonData = [];
 
-    fs.readFile(uploadPath, async (error, data) => {
+    fs.readFile(file.tempFilePath, async (error, data) => {
       if (error) {
         console.error('Error al leer el archivo:', error);
       } else {
@@ -206,14 +195,9 @@ const uploadFiles = (req, res = response) => {
         res.json({ message: 'Model created !!!', model: modelBuilt });
       }
     });
-  });
 }
 
 const uploadKeywords = (req, res = response) => {
-
-
-  let sampleFile;
-  let uploadPath;
 
   if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
     res.status(400).send('No hay archivos para subir');
@@ -224,30 +208,22 @@ const uploadKeywords = (req, res = response) => {
 
   const { file } = req.files;
 
-  uploadPath = path.join(__dirname, '../uploads/', sampleFile.name);
+  fs.readFile(file.tempFilePath, async (error, data) => {
+    if (error) {
+      console.error('Error al leer el archivo:', error);
+    } else {
+      const arrayBuffer = data;
+      const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
 
-  file.mv(uploadPath, (err) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ err });
+      // Accede a la hoja de trabajo deseada (por ejemplo, la primera hoja)
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      // Convierte los datos de la hoja de trabajo a un objeto JSON
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      console.log(jsonData);
+
+      await insertKeywords(jsonData);
     }
-
-    fs.readFile(uploadPath, async (error, data) => {
-      if (error) {
-        console.error('Error al leer el archivo:', error);
-      } else {
-        const arrayBuffer = data;
-        const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
-
-        // Accede a la hoja de trabajo deseada (por ejemplo, la primera hoja)
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-        // Convierte los datos de la hoja de trabajo a un objeto JSON
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-        await insertKeywords(jsonData);
-      }
-    });
   });
 }
 
