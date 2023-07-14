@@ -7,6 +7,7 @@ import fileUpload from "express-fileupload";
 import authRoutes from "../routes/auth.js";
 import userRoutes from "../routes/user.js";
 import uploadRoutes from "../routes/uploads.js";
+import modelRoutes from "../routes/model.js";
 
 import { dbConnection } from "../database/config.js";
 
@@ -20,6 +21,7 @@ class Server {
         this.userPath = '/api/user';
         this.authPath = '/api/auth';
         this.uploadsPath = '/api/uploads';
+        this.modelPath = '/api/model';
 
         //Connect DB
         this.connectDB();
@@ -51,6 +53,7 @@ class Server {
         this.app.use(this.authPath, authRoutes);
         this.app.use(this.userPath, userRoutes);
         this.app.use(this.uploadsPath, uploadRoutes);
+        this.app.use(this.modelPath, modelRoutes);
     }
 
     listen() {

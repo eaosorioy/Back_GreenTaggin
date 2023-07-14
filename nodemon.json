@@ -1,0 +1,6 @@
+{
+    "ignore": [
+        "models/model.js",
+        "models/sector.js"
+    ]
+}
