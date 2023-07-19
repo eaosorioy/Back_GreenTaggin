@@ -1,6 +1,7 @@
 {
     "ignore": [
         "models/model.js",
-        "models/sector.js"
+        "models/sector.js",
+        "models/wallet.js"
     ]
 }

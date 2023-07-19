@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 import { response } from "express";
 import { fileURLToPath } from 'url';
 import { create_model } from "./model.js";
-import { log } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -220,7 +219,15 @@ const upload_model = async (req, res = response) => {
 
     const { file } = req.files;
 
-    const uploadPath = path.join(__dirname, '../uploads/' + file.name);
+    const pathDirectory = path.join(__dirname, '../uploads/models/');
+
+    if (!fs.existsSync(pathDirectory)) {
+      fs.mkdirSync(pathDirectory, { recursive: true });
+    }
+
+    const uploadPath = path.join(pathDirectory + file.name);
+
+    // const uploadPath = path.join(__dirname, '../uploads/models/' + file.name);
 
     file.mv(uploadPath, async (err) => {
       if (err) {
@@ -255,18 +262,20 @@ const upload_model = async (req, res = response) => {
 }
 
 const verify_file = (req, res = response) => {
-  let {filename} = req.params;
-  const filePath = path.join(__dirname, '../uploads/', `${filename}.xlsx`);
+  let { filename } = req.params;
+  const filePath = path.join(__dirname, '../uploads/models/', `${filename}.xlsx`);
   if (fs.existsSync(filePath)) {
     const stats = fs.statSync(filePath);
-    return res.status(200).json({message: 'Ok', status: 200, file: {
-      name: `${filename}.xlsx`,
-      size: stats.size,
-      createdAt: stats.birthtime,
-      modifiedAt: stats.mtime
-    }});
+    return res.status(200).json({
+      message: 'Ok', status: 200, file: {
+        name: `${filename}.xlsx`,
+        size: stats.size,
+        createdAt: stats.birthtime,
+        modifiedAt: stats.mtime
+      }
+    });
   } else {
-    return res.status(200).json({message: 'El archivo no existe'}); // El archivo no existe
+    return res.status(200).json({ message: 'El archivo no existe' }); // El archivo no existe
   }
 };
 

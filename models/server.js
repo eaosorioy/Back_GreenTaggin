@@ -8,6 +8,7 @@ import authRoutes from "../routes/auth.js";
 import userRoutes from "../routes/user.js";
 import uploadRoutes from "../routes/uploads.js";
 import modelRoutes from "../routes/model.js";
+import walletRoutes from "../routes/wallet.js";
 
 import { dbConnection } from "../database/config.js";
 
@@ -22,6 +23,7 @@ class Server {
         this.authPath = '/api/auth';
         this.uploadsPath = '/api/uploads';
         this.modelPath = '/api/model';
+        this.walletPath = '/api/wallet';
 
         //Connect DB
         this.connectDB();
@@ -54,6 +56,7 @@ class Server {
         this.app.use(this.userPath, userRoutes);
         this.app.use(this.uploadsPath, uploadRoutes);
         this.app.use(this.modelPath, modelRoutes);
+        this.app.use(this.walletPath, walletRoutes);
     }
 
     listen() {

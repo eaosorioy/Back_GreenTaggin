@@ -38,9 +38,10 @@ const insert_sectors = async (array) => {
     return new Promise((resolve, reject) => {
         Sector.deleteMany()
             .then(() => {
+                console.log('Sectors deleted !!!');
                 Sector.insertMany(array)
                     .then(result => {
-                        // console.log('Sectors saved !!!');
+                        console.log('Sectors saved !!!');
                         return resolve(result);
                     })
                     .catch(error => {
@@ -70,9 +71,10 @@ const insert_climate_target = async (array) => {
     return new Promise((resolve, reject) => {
         ClimateTarget.deleteMany()
             .then(() => {
+                console.log('Climate target deleted !!!');
                 ClimateTarget.insertMany(array)
                     .then(result => {
-                        // console.log('Sectors saved !!!');
+                        console.log('Climate target saved !!!');
                         return resolve(result);
                     })
                     .catch(error => {
@@ -109,9 +111,10 @@ const insert_categories = async (array) => {
     return new Promise((resolve, reject) => {
         Category.deleteMany()
             .then(() => {
+                console.log('Categories deleted !!!');
                 Category.insertMany(array)
                     .then(result => {
-                        // console.log('Sectors saved !!!');
+                        console.log('Categories saved !!!');
                         return resolve(result);
                     })
                     .catch(error => {
@@ -151,9 +154,10 @@ const insert_activities = async (array) => {
     return new Promise((resolve, reject) => {
         Activity.deleteMany()
             .then(() => {
+                console.log('Activities deleted !!!');
                 Activity.insertMany(array)
                     .then(result => {
-                        // console.log('Sectors saved !!!');
+                        console.log('Activities saved !!!');
                         return resolve(result);
                     })
                     .catch(error => {
@@ -188,9 +192,10 @@ const insert_model = async (array) => {
     return new Promise((resolve, reject) => {
         Model.deleteMany()
             .then(() => {
+                console.log('Model deleted !!!');
                 Model.insertMany(array)
                     .then(result => {
-                        // console.log('Sectors saved !!!');
+                        console.log('Model saved !!!');
                         return resolve(result);
                     })
                     .catch(error => {
@@ -239,7 +244,17 @@ const get_model = async (req = request, res = response) => {
     }
 }
 
+const get_sectors = async (req = request, res = response) => {
+    try {
+        const sectors = await Sector.find();
+        res.status(200).json({ message: 'Ok', status: 200, sectors });
+    } catch (error) {
+        res.status(400).json({ message: 'Error', status: 400, error });
+    }
+}
+
 export {
     create_model,
-    get_model
+    get_model,
+    get_sectors
 }
